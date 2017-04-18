@@ -13,12 +13,18 @@ create or replace type body hash_key as
     return;
   end;
 
-  member function push(p_string_value in varchar2) return hash_key
+  member function push(p_string_value in varchar2 default null) return hash_key
   is
     l_object hash_key := self;
   begin
     l_object.buffer.append(p_string_value);
     return l_object;
+  end;
+  
+  member procedure push(p_string_value in varchar2 default null)
+  is
+  begin
+    buffer.append(p_string_value);
   end;
 
   member function push(p_number_value in number) return hash_key
@@ -28,13 +34,25 @@ create or replace type body hash_key as
     l_object.buffer.append(to_char(p_number_value));
     return l_object;
   end;
+  
+  member procedure push(p_number_value in number)
+  is
+  begin
+    buffer.append(to_char(p_number_value));
+  end;
 
   member function push(p_date_value in date) return hash_key
   is
     l_object hash_key := self;
   begin
-    l_object.buffer.append(to_char(p_date_value, 'dd:mm:yyyy:hh24:mi:ss'));
+    l_object.buffer.append(to_char(p_date_value, hash_key.date_format));
     return l_object;
+  end;
+  
+  member procedure push(p_date_value in date)
+  is
+  begin
+    buffer.append(to_char(p_date_value, hash_key.date_format));
   end;
 
   member function push(p_clob_value in clob) return hash_key
@@ -43,6 +61,12 @@ create or replace type body hash_key as
   begin
     l_object.buffer.append(p_clob_value);
     return l_object;
+  end;
+  
+  member procedure push(p_clob_value in clob)
+  is
+  begin
+    buffer.append(p_clob_value);
   end;
 
   member function get return varchar2
@@ -63,6 +87,12 @@ create or replace type body hash_key as
       l_self.buffer.reserve(l_reserve);
       return dbms_crypto.hash(l_reserve, l_hash_algorithm);
     end if;
+  end;
+  
+  static function date_format return varchar2
+  is
+  begin
+    return 'dd:mm:yyyy:hh24:mi:ss';
   end;
   
   static function hash_algorithm(p_algorithm_type in varchar2) return number
