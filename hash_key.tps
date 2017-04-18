@@ -5,19 +5,34 @@ create or replace type hash_key as object (
   constructor function hash_key(p_algorithm_type in varchar2 := 'SHA1') return self as result,
 
   -- Set string value in buffer
-  member function push(p_string_value in varchar2) return hash_key,
+  member function push(p_string_value in varchar2 default null) return hash_key,
+
+  -- Set string value in buffer
+  member procedure push(p_string_value in varchar2 default null),
 
   -- Set number value in buffer
   member function push(p_number_value in number) return hash_key,
+  
+  -- Set number value in buffer
+  member procedure push(p_number_value in number),
 
   -- Set date value in buffer
   member function push(p_date_value in date) return hash_key,
+  
+  -- Set date value in buffer
+  member procedure push(p_date_value in date),
 
   -- Set LOB object in buffer
   member function push(p_clob_value in clob) return hash_key,
 
+  -- Set LOB object in buffer
+  member procedure push(p_clob_value in clob),
+
   -- Get hash key value by buffer and hash algorithm
   member function get return varchar2,
+  
+  -- Get current date format
+  static function date_format return varchar2,
   
   -- Get mapped hash algorithm type number by string name of algorithm
   static function hash_algorithm(p_algorithm_type in varchar2) return number
